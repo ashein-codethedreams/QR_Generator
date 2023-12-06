@@ -1,54 +1,41 @@
-import { Button, Input } from "antd";
-import React, { useState } from "react";
-import QRCode from "react-qr-code";
+import { Button } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import React, { useRef, useState } from "react";
+import QrReader from "react-qr-reader";
 
 const QRGenerator = () => {
-  const [inputText, setInputText] = useState("");
-  const [qr, setQr] = useState("");
+  const [scannedText, setScannedText] = useState("No Result");
 
-  const handleTextToQR = () => {
-    setQr(inputText);
+  const qrRef = useRef(null);
+
+  const handleOnScan = (data) => {
+    if (data) {
+      setScannedText(data);
+    }
   };
+
+  const handleOnError = (err) => {
+    console.error(err);
+  };
+
+  const openDialog = () => {
+    qrRef.current.openImageDialog();
+  };
+
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          padding: "10px",
-        }}
-      >
-        <Input
-          style={{
-            border: "1px solid green",
-            borderRadius: "1px",
-            width: "300px",
-            marginRight: "20px",
-          }}
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Enter text for QR code"
-        />
-        <Button
-          onClick={handleTextToQR}
-          style={{
-            backgroundColor: "green",
-            color: "white",
-            borderRadius: "1px",
-          }}
-        >
-          Generate
-        </Button>
-      </div>
-      <div
-        style={{
-          marginTop: "50px",
-          marginLeft: "50px",
-        }}
-      >
-        {qr && <QRCode value={qr} />}
-      </div>
+      <Button onClick={openDialog} icon={<UploadOutlined />}>
+        Upload QR Code Photo
+      </Button>
+
+      {scannedText && <p>Scanned Text: {scannedText}</p>}
+      <QrReader
+        ref={qrRef}
+        delay={300}
+        onError={handleOnError}
+        onScan={handleOnScan}
+        legacyMode
+      />
     </div>
   );
 };
